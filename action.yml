@@ -7,8 +7,8 @@ branding:
   icon: 'arrow-right-circle'
   color: 'gray-dark'
 inputs:
-  authkey:
-    description: 'Your Tailscale authentication key, from the admin panel.'
+  authkey_file:
+    description: 'Path to the file containing your Tailscale authentication key, from the admin panel.'
     required: true
   version:
     description: 'Tailscale version to use.'
@@ -65,11 +65,11 @@ runs:
       - name: Connect to Tailscale
         shell: bash
         env:
-          TAILSCALE_AUTHKEY: ${{ inputs.authkey }}
+          TAILSCALE_AUTHKEY_FILE: ${{ inputs.authkey_file }}
           ADDITIONAL_ARGS: ${{ inputs.args }}
           HOSTNAME: ${{ inputs.hostname }}
         run: |
           if [ -z "${HOSTNAME}" ]; then
             HOSTNAME="github-$(cat /etc/hostname)"
           fi
-          sudo -E tailscale up --authkey ${TAILSCALE_AUTHKEY} --hostname=${HOSTNAME} --accept-routes ${ADDITIONAL_ARGS}
+          sudo -E tailscale up --authkey $(cat ${TAILSCALE_AUTHKEY_FILE}) --hostname=${HOSTNAME} --accept-routes ${ADDITIONAL_ARGS}
